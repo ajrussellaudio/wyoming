@@ -34,9 +34,6 @@ class MountainsLayer {
   }
 
   draw() {
-    fill(this.colour);
-    beginShape();
-    vertex(0, height);
     const distance = map(
       this.depth,
       0,
@@ -44,10 +41,22 @@ class MountainsLayer {
       height / 6,
       (height * 2) / 3
     );
+    beginShape();
+    vertex(0, height);
+
     for (let i = 0; i < this.points.length; i++) {
-      const x = map(i, 0, this.points.length - 1, 0, width);
-      const y = map(this.points[i], 0, 1, 0, 200) + distance;
-      vertex(x, y);
+      fill(this.colour);
+      noStroke();
+      const x = i => map(i, 0, this.points.length - 1, 0, width);
+      const y = i => map(this.points[i], 0, 1, 0, 200) + distance;
+      vertex(x(i), y(i));
+      const lerpScaleFactor = random();
+      const treePosition = createVector(
+        lerp(x(i), x(i + 1), lerpScaleFactor),
+        lerp(y(i), y(i + 1), lerpScaleFactor)
+      );
+      const tree = new Tree(treePosition, 3 ** this.depth, this.colour);
+      tree.draw();
     }
     vertex(width, height);
     endShape();
@@ -62,5 +71,28 @@ class Sky {
   draw() {
     fill(this.colour);
     rect(0, 0, width, height);
+  }
+}
+
+class Tree {
+  constructor(position, scale, colour) {
+    this.position = position;
+    this.scale = scale;
+    this.colour = colour;
+  }
+
+  draw() {
+    push();
+    translate(this.position.x, this.position.y + random(this.scale));
+    triangle(
+      0,
+      (-this.scale * 3) / 4,
+      this.scale / 5,
+      -this.scale / 50,
+      -this.scale / 5,
+      -this.scale / 50
+    );
+    rect(-this.scale / 50, -this.scale / 50, this.scale / 20, this.scale / 20);
+    pop();
   }
 }
