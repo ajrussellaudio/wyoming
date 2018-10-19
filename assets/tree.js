@@ -1,26 +1,42 @@
 function setup() {
   createCanvas(400, 400);
   background("pink");
-
-  const tree = new Tree(width / 2, height, width / 2, height / 2, "red");
+  fill("black");
+  const tree = new Tree(createVector(width / 2, height), width / 2, -100);
   tree.draw();
 }
 
 class Tree {
-  constructor(posX, posY, x, y, colour) {
-    this.position = createVector(posX, posY);
-    this.size = createVector(x, y);
-    this.colour = colour;
+  constructor(position, scale, offset) {
+    this.position = position;
+    this.scale = scale;
+    this.offset = offset;
   }
 
   draw() {
-    fill(this.colour);
-    noStroke();
-    const { x, y } = this.size;
+    const drawTrunk = () => {
+      const tip = -this.scale;
+      const baseWidth = this.scale / 50;
+      const baseHeight = this.scale / 10;
+      triangle(0, tip, baseWidth, baseHeight, -baseWidth, baseHeight);
+    };
+    const drawCanopy = (height, count) => {
+      const tip = map(height, 0, count, -this.scale, -this.scale / 10);
+      const base = map(height, 0, count, this.scale / 10, this.scale / 5);
+      const width = (base * height) / count;
+      const wobble = value => value + random(-this.scale / 80, this.scale / 80);
+      push();
+      translate(0, tip);
+      triangle(0, 0, wobble(width), wobble(base), -wobble(width), wobble(base));
+      pop();
+    };
     push();
-    translate(this.position.x, this.position.y);
-    triangle(0, (-y * 3) / 4, x / 5, -y / 50, -x / 5, -y / 50);
-    rect(-x / 50, -y / 50, x / 20, y / 20);
+    translate(this.position.x, this.position.y + this.offset);
+    const canopyCount = 12;
+    for (let i = 0; i < canopyCount; i++) {
+      drawCanopy(i, canopyCount);
+    }
+    drawTrunk();
     pop();
   }
 }

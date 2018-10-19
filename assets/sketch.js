@@ -41,21 +41,21 @@ class MountainsLayer {
       height / 6,
       (height * 2) / 3
     );
+
     beginShape();
     vertex(0, height);
-
     for (let i = 0; i < this.points.length; i++) {
       fill(this.colour);
-      noStroke();
       const x = i => map(i, 0, this.points.length - 1, 0, width);
-      const y = i => map(this.points[i], 0, 1, 0, 200) + distance;
+      const y = i => map(this.points[i] || 1, 0, 1, 0, 200) + distance;
       vertex(x(i), y(i));
       const lerpScaleFactor = random();
       const treePosition = createVector(
         lerp(x(i), x(i + 1), lerpScaleFactor),
         lerp(y(i), y(i + 1), lerpScaleFactor)
       );
-      const tree = new Tree(treePosition, 3 ** this.depth, this.colour);
+      const treeScale = random(2 ** this.depth - 2, 3 ** this.depth - 3);
+      const tree = new Tree(treePosition, treeScale, random(treeScale));
       tree.draw();
     }
     vertex(width, height);
@@ -75,24 +75,37 @@ class Sky {
 }
 
 class Tree {
-  constructor(position, scale, colour) {
+  constructor(position, scale, offset) {
     this.position = position;
     this.scale = scale;
-    this.colour = colour;
+    this.offset = offset;
   }
 
   draw() {
+    const drawTrunk = () => {
+      const tip = -this.scale;
+      const baseWidth = this.scale / 50;
+      const baseHeight = this.scale / 10;
+      triangle(0, tip, baseWidth, baseHeight, -baseWidth, baseHeight);
+    };
+    const drawCanopy = (height, count) => {
+      const tip = map(height, 0, count, -this.scale, -this.scale / 10);
+      const base = map(height, 0, count, this.scale / 10, this.scale / 5);
+      const width = (base * height) / count;
+      const wobble = value =>
+        value + random(-this.scale / 120, this.scale / 120);
+      push();
+      translate(0, tip);
+      triangle(0, 0, wobble(width), wobble(base), -wobble(width), wobble(base));
+      pop();
+    };
     push();
-    translate(this.position.x, this.position.y + random(this.scale));
-    triangle(
-      0,
-      (-this.scale * 3) / 4,
-      this.scale / 5,
-      -this.scale / 50,
-      -this.scale / 5,
-      -this.scale / 50
-    );
-    rect(-this.scale / 50, -this.scale / 50, this.scale / 20, this.scale / 20);
+    translate(this.position.x, this.position.y + this.offset);
+    const canopyCount = random(9, 20);
+    for (let i = 0; i < canopyCount; i++) {
+      drawCanopy(i, canopyCount);
+    }
+    drawTrunk();
     pop();
   }
 }
