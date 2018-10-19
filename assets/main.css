@@ -1,3 +1,28 @@
 body {
   margin: 0;
+  background-color: #830034;
+  /* // foreground colours: #570335, #33152D */
+}
+
+#info {
+  margin: 0 auto;
+  width: 75%;
+  color: #ffdcc5;
+  font-family: "Montserrat", sans-serif;
+}
+
+h1 {
+  font-family: "Libre Baskerville", serif;
+}
+
+a,
+a:link,
+a:visited {
+  color: #ff7344;
+}
+
+a:hover,
+a:active,
+a:focus {
+  color: #ff864f;
 }

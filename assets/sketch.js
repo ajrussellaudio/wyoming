@@ -4,7 +4,8 @@ let sky;
 // foreground colours: #570335, #33152D
 
 function setup() {
-  createCanvas(window.innerWidth, window.innerHeight);
+  const canvas = createCanvas(window.innerWidth, window.innerHeight / 2);
+  canvas.parent("#sketch");
   noStroke();
   const colours = ["#FF864F", "#FF7344", "#FB463E", "#C9253E", "#830034"];
   mountains = [];
@@ -46,7 +47,7 @@ class MountainsLayer {
     vertex(0, height);
     for (let i = 0; i < this.points.length; i++) {
       fill(this.colour);
-      const x = i => map(i, 0, this.points.length - 1, 0, width);
+      const x = i => map(i, 0, this.points.length - 1, 0, max(width, 640));
       const y = i => map(this.points[i] || 1, 0, 1, 0, 200) + distance;
       vertex(x(i), y(i));
       const lerpScaleFactor = random();
