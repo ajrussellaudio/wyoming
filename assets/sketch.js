@@ -80,7 +80,12 @@ class Sky {
     this.clouds = [];
     for (let i = 0; i < numClouds; i++) {
       this.clouds.push(
-        new Cloud(random(width), random(height / 2), random(0.5), this.colour)
+        new Cloud(
+          random(width * 2),
+          random(height / 2),
+          random(0.5),
+          this.colour
+        )
       );
     }
   }
