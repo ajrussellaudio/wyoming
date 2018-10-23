@@ -74,8 +74,15 @@ class MountainsLayer {
 
 class Sky {
   constructor(colour) {
-    this.colour = colour;
-    this.clouds = [new Cloud(width, 100)];
+    this.colour = color(colour);
+    const numClouds = random(50, 100);
+    // const numClouds = 1;
+    this.clouds = [];
+    for (let i = 0; i < numClouds; i++) {
+      this.clouds.push(
+        new Cloud(random(width), random(height / 2), random(0.5), this.colour)
+      );
+    }
   }
 
   update() {
@@ -85,23 +92,51 @@ class Sky {
   draw() {
     fill(this.colour);
     rect(0, 0, width, height);
-    fill(255);
     this.clouds.forEach(cloud => cloud.draw());
   }
 }
 
 class Cloud {
-  constructor(x, y) {
-    this.position = createVector(x, y);
+  constructor(x, y, speed, skyColour) {
+    this.speed = speed;
+    this.skyColour = skyColour;
+    this.colour = lerpColor(skyColour, color("white"), random(0.5));
+    this.particles = [];
+    this.initParticles(x, y);
+  }
+
+  initParticles(x, y) {
+    const numParticles = int(random(5, 50));
+    for (let i = 0; i < numParticles; i++) {
+      this.particles.push(
+        createVector(
+          x + random(-numParticles, numParticles),
+          y + random(-numParticles, numParticles),
+          random(60)
+        )
+      );
+    }
+    this.particles.sort((a, b) => a.y > b.y);
   }
 
   move() {
-    this.position.add(-0.25, 0);
+    this.particles.forEach(particle => {
+      particle.add(-this.speed, 0);
+    });
+    if (this.particles.every(particle => particle.x < 0)) {
+      this.initParticles(width + random(width), random(height));
+    }
   }
 
   draw() {
-    const { x, y } = this.position;
-    ellipse(x, y, 40, 10);
+    this.particles.forEach(({ x, y, z }) => {
+      fill(lerpColor(this.skyColour, this.colour, 0.5));
+      ellipse(x, y, z, z / 2);
+      fill(this.colour);
+      const offset = 1 / 8;
+      const size = 3 / 4;
+      ellipse(x - z * offset, y - z * offset, z * size, (z * size) / 2);
+    });
   }
 }
 
